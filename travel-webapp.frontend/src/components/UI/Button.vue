@@ -13,6 +13,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   variant: {
@@ -31,6 +34,10 @@ const variantClass = computed(() => {
     secondary: 'btn-secondary'
   }[props.variant]
 })
+
+function goToTrips() {
+  router.push('/trips')
+}
 </script>
 
 <style scoped>

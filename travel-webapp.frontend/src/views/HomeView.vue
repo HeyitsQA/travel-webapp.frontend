@@ -55,7 +55,7 @@ function createTrip() {
 }
 
 .title {
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 500;
   margin-bottom: 24px;
   color: var(--text);
