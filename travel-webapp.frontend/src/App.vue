@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import SignUp from './components/SignUp.vue'
 </script>
 
 <template>
