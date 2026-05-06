@@ -1,0 +1,109 @@
+@import './base.css';
+
+:root {
+  /* Backgrounds */
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+
+  /* Pastel accents */
+  --pink: #f7b6c8;
+  --blue: #bcd7f7;
+  --green: #bfe6d0;
+  --lavender: #d9c7f7;
+
+  /* Text */
+  --text: #1f1f1f;
+  --muted: #6b6b6b;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial;
+  --font-serif: "Playfair Display", serif;
+}
+
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+
+#app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+a {
+  text-decoration: none;
+  color: var(--text);
+  position: relative;
+  transition: 0.25s ease;
+}
+
+a:hover {
+  color: var(--pink);
+}
+
+/* soft underline animation */
+a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--pink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+a:hover::after {
+  transform: scaleX(1);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+p {
+  color: var(--muted);
+}
+
+.pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--pink);
+  font-size: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.accent-pink { color: var(--pink); }
+.accent-blue { color: var(--blue); }
+.accent-green { color: var(--green); }
+
+
+@media (min-width: 1024px) {
+  body {
+    display: block;
+  }
+
+  #app {
+    padding: 3rem;
+  }
+}
