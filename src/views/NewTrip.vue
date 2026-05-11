@@ -27,7 +27,7 @@ function handleSubmit() {
 }
 
 function goBack() {
-  router.push('/trips')
+  router.push('/')
 }
 </script>
 

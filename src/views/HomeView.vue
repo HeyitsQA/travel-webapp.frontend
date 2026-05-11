@@ -7,11 +7,11 @@
 
       <div class="actions">
         <Button fullWidth @click="goToTrips">
-          View My Trips
+          Trip Overview
         </Button>
 
         <Button variant="secondary" fullWidth @click="createTrip">
-          Log New Trip
+          Create Trip
         </Button>
       </div>
     </div>
@@ -39,7 +39,7 @@ function createTrip() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--bg);
+  background: var(bg);
   padding: 2rem;
 }
 
