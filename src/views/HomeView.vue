@@ -39,7 +39,7 @@ function createTrip() {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(bg);
+  background: var(--bg);
   padding: 2rem;
 }
 
