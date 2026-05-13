@@ -45,12 +45,14 @@ function createTrip() {
 
 .content {
   text-align: center;
-  max-width: 360px;
+  max-width: 520px;
   width: 100%;
+  min-height: 60vh;
+  padding: 3rem;
 }
 
 .logo {
-  width: 120px;
+  width: 160px;
   margin-bottom: 16px;
 }
 
@@ -64,6 +66,6 @@ function createTrip() {
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 </style>
