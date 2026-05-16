@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import TripOverview from '../views/TripOverview.vue'
 import NewTrip from '@/views/NewTrip.vue'
 import LoginView from '@/views/LoginView.vue'
-import SignUpView from '@/views/SignUpView.vue'
+import SignupView from '@/views/SignupView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,7 +31,7 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: SignUpView,
+      component: SignupView,
     },
     {
       path: '/trips/:id',

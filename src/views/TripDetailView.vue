@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { fetchTrip } from '@/services/tripService'
+import { fetchTrip } from '../services/tripService'
 
 const route = useRoute()
 const trip = ref(null)
