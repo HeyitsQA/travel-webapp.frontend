@@ -7,7 +7,7 @@ const props = defineProps<{
   tripId: number
 }>()
 
-const emit = defineEmits(['place-added']()
+const emit = defineEmits(['place-added'])
 
 const isOpen = ref(false)
 const loading = ref(false)
@@ -38,7 +38,7 @@ async function submitForm() {
       ...formData.value,
       trip: { tripId: props.tripId }
     })
-    
+
     emit('place-added', newPlace)
     resetForm()
     isOpen.value = false

@@ -6,18 +6,11 @@ const props = defineProps<{
   place: Place
 }>()
 
-const emit = defineEmits(['update:place', 'delete']()
+const emit = defineEmits(['update:place', 'delete'])
 
 const isEditing = ref(false)
 const editedPlace = ref<Place>({ ...props.place })
-
-const ratingStars = computed(() => {
-  const rating = editedPlace.value.rating || 0
-  return Array.from({ length: 5 }, (_, i) => ({
-    filled: i < Math.floor(rating),
-    half: i === Math.floor(rating) && rating % 1 !== 0
-  }))
-})
+)
 
 function startEdit() {
   isEditing.value = true
