@@ -10,7 +10,7 @@ const emit = defineEmits(['update:place', 'delete'])
 
 const isEditing = ref(false)
 const editedPlace = ref<Place>({ ...props.place })
-)
+
 
 function startEdit() {
   isEditing.value = true
