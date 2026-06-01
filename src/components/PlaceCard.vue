@@ -2,68 +2,40 @@
 import { ref, computed } from 'vue'
 import type { Place } from '@/types'
 
-const props = defineProps<{
-  place: Place
-}>()
-
+const props = defineProps<{ place: Place }>()
 const emit = defineEmits(['update:place', 'delete'])
 
 const isEditing = ref(false)
 const editedPlace = ref<Place>({ ...props.place })
 
+function startEdit() { isEditing.value = true; editedPlace.value = { ...props.place } }
+function cancelEdit() { isEditing.value = false; editedPlace.value = { ...props.place } }
+function saveEdit() { emit('update:place', editedPlace.value); isEditing.value = false }
+function setRating(stars: number) { editedPlace.value.rating = stars }
+function deletePlace() { emit('delete', props.place.placeId) }
 
-function startEdit() {
-  isEditing.value = true
-  editedPlace.value = { ...props.place }
-}
-
-function cancelEdit() {
-  isEditing.value = false
-  editedPlace.value = { ...props.place }
-}
-
-function saveEdit() {
-  emit('update:place', editedPlace.value)
-  isEditing.value = false
-}
-
-function setRating(stars: number) {
-  editedPlace.value.rating = stars
-}
-
-function deletePlace() {
-  emit('delete', props.place.placeId)
-}
-
-const statusLabel = computed(() => {
-  return props.place.status === 'visited' ? '✓ Visited' : '○ Planned'
-})
+const statusLabel = computed(() => props.place.status === 'visited' ? '✓ Visited' : '○ Planned')
 </script>
 
 <template>
-  <div class="place-card" :class="{ editing: isEditing }">
+  <div class="card place-card">
     <!-- View Mode -->
-    <div v-if="!isEditing" class="place-content">
+    <div v-if="!isEditing">
       <div class="place-header">
         <h3 class="place-name">{{ place.name }}</h3>
-        <span class="status-badge" :class="place.status">
+        <span class="pill" :class="place.status === 'visited' ? 'status-visited' : 'status-planned'">
           {{ statusLabel }}
         </span>
       </div>
-
       <div class="place-meta">
-        <span v-if="place.category" class="category">📍 {{ place.category }}</span>
-        <span v-if="place.rating" class="rating">
-          ⭐ {{ place.rating }}/5
-        </span>
+        <span v-if="place.category">📍 {{ place.category }}</span>
+        <span v-if="place.rating">⭐ {{ place.rating }}/5</span>
       </div>
-
+      <p v-if="place.address" class="detail">🗺 {{ place.address }}</p>
       <p v-if="place.notes" class="notes">{{ place.notes }}</p>
-
-      <div v-if="place.visitDate" class="visit-date">
+      <p v-if="place.visitDate" class="detail">
         📅 {{ new Date(place.visitDate).toLocaleDateString('de-DE') }}
-      </div>
-
+      </p>
       <div class="place-actions">
         <button class="btn-edit" @click="startEdit">Edit</button>
         <button class="btn-delete" @click="deletePlace">Delete</button>
@@ -71,14 +43,13 @@ const statusLabel = computed(() => {
     </div>
 
     <!-- Edit Mode -->
-    <div v-else class="place-edit">
-      <div class="form-group">
+    <div v-else class="form">
+      <div class="field">
         <label>Name</label>
-        <input v-model="editedPlace.name" type="text" placeholder="Place name" />
+        <input v-model="editedPlace.name" type="text" />
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
+      <div class="row">
+        <div class="field">
           <label>Category</label>
           <select v-model="editedPlace.category">
             <option value="">Select category</option>
@@ -90,8 +61,7 @@ const statusLabel = computed(() => {
             <option value="Other">📍 Other</option>
           </select>
         </div>
-
-        <div class="form-group">
+        <div class="field">
           <label>Status</label>
           <select v-model="editedPlace.status">
             <option value="planned">Planned</option>
@@ -99,259 +69,63 @@ const statusLabel = computed(() => {
           </select>
         </div>
       </div>
-
-      <div class="form-group">
-        <label>Rating (1-5)</label>
-        <div class="rating-input">
-          <button
-            v-for="star in 5"
-            :key="star"
-            class="star"
-            :class="{ active: editedPlace.rating && editedPlace.rating >= star }"
-            @click="setRating(star)"
-          >
-            ⭐
-          </button>
-          <span v-if="editedPlace.rating" class="rating-value">{{ editedPlace.rating }}/5</span>
+      <div class="field">
+        <label>Address</label>
+        <input v-model="editedPlace.address" type="text" placeholder="e.g. Champ de Mars, Paris" />
+      </div>
+      <div class="field">
+        <label>Rating</label>
+        <div class="stars">
+          <button v-for="star in 5" :key="star" class="star"
+                  :class="{ active: editedPlace.rating && editedPlace.rating >= star }"
+                  @click="setRating(star)">⭐</button>
+          <span v-if="editedPlace.rating" class="rating-text">{{ editedPlace.rating }}/5</span>
         </div>
       </div>
-
-      <div class="form-group">
+      <div class="field">
         <label>Visit Date</label>
         <input v-model="editedPlace.visitDate" type="datetime-local" />
       </div>
-
-      <div class="form-group">
+      <div class="field">
         <label>Notes</label>
-        <textarea
-          v-model="editedPlace.notes"
-          placeholder="Your thoughts about this place..."
-          rows="3"
-        ></textarea>
+        <textarea v-model="editedPlace.notes" rows="3"></textarea>
       </div>
-
-      <div class="form-group">
-        <label>Latitude</label>
-        <input v-model.number="editedPlace.latitude" type="number" placeholder="0.0000" step="0.0001" />
-      </div>
-
-      <div class="form-group">
-        <label>Longitude</label>
-        <input v-model.number="editedPlace.longitude" type="number" placeholder="0.0000" step="0.0001" />
-      </div>
-
-      <div class="edit-actions">
+      <div class="place-actions">
         <button class="btn-save" @click="saveEdit">Save</button>
-        <button class="btn-cancel" @click="cancelEdit">Cancel</button>
+        <button class="btn-secondary" @click="cancelEdit">Cancel</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.place-card {
-  background: white;
-  border: 1px solid #e8e4dd;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-  transition: all 0.2s ease;
+.place-card { margin-bottom: 12px; transition: box-shadow 0.2s; }
+.place-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.place-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+.place-name { margin: 0; font-size: 16px; }
+.status-visited { background: var(--green); }
+.status-planned { background: var(--lavender); }
+.place-meta { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.detail { font-size: 13px; color: var(--muted); margin: 4px 0; }
+.notes { font-size: 13px; color: var(--muted); margin: 8px 0; }
+.place-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn-edit { padding: 6px 14px; background: var(--blue); color: var(--text); border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-delete { padding: 6px 14px; background: #ffe8e8; color: #cc0000; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-save { padding: 6px 14px; background: var(--green); color: var(--text); border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.btn-secondary { padding: 6px 14px; background: var(--surface); color: var(--muted); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer; }
+.form { display: flex; flex-direction: column; gap: 12px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.field input, .field select, .field textarea {
+  padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px;
+  font-size: 13px; font-family: var(--font-sans); background: var(--surface); color: var(--text);
 }
-
-.place-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: #d4cec5;
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--pink); box-shadow: 0 0 0 3px rgba(247,182,200,0.2);
 }
-
-.place-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 12px;
-}
-
-.place-name {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-}
-
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.status-badge.visited {
-  background: #d4f4dd;
-  color: #1a7a2a;
-}
-
-.status-badge.planned {
-  background: #ffecd1;
-  color: #8b5a00;
-}
-
-.place-meta {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
-  font-size: 13px;
-}
-
-.category,
-.rating {
-  color: #666;
-}
-
-.notes {
-  margin: 12px 0;
-  color: #555;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.visit-date {
-  font-size: 12px;
-  color: #999;
-  margin: 8px 0;
-}
-
-.place-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.btn-edit,
-.btn-delete,
-.btn-save,
-.btn-cancel {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-edit {
-  background: #e8f2ff;
-  color: #0066cc;
-}
-
-.btn-edit:hover {
-  background: #cce0ff;
-}
-
-.btn-delete {
-  background: #ffe8e8;
-  color: #cc0000;
-}
-
-.btn-delete:hover {
-  background: #ffcccc;
-}
-
-.btn-save {
-  background: #d4f4dd;
-  color: #1a7a2a;
-}
-
-.btn-save:hover {
-  background: #a8e6b5;
-}
-
-.btn-cancel {
-  background: #f0f0f0;
-  color: #666;
-}
-
-.btn-cancel:hover {
-  background: #e0e0e0;
-}
-
-/* Edit Mode */
-.place-edit {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 4px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: 8px 10px;
-  border: 1px solid #e8e4dd;
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: inherit;
-  color: #222;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.rating-input {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.star {
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  opacity: 0.3;
-  transition: opacity 0.2s;
-}
-
-.star.active {
-  opacity: 1;
-}
-
-.star:hover {
-  opacity: 0.6;
-}
-
-.rating-value {
-  margin-left: 8px;
-  font-size: 13px;
-  color: #999;
-}
-
-.edit-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
+.stars { display: flex; align-items: center; gap: 2px; }
+.star { background: none; border: none; cursor: pointer; font-size: 19px; opacity: 0.25; padding: 0; transition: opacity 0.15s; }
+.star.active { opacity: 1; }
+.rating-text { margin-left: 6px; font-size: 12px; color: var(--muted); }
 </style>

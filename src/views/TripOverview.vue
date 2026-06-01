@@ -1,20 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { tripService } from '@/services/apiService'  // ← apiService not tripService
+import { tripService } from '@/services/apiService'
 import TripCard from '../components/TripCard.vue'
+import type { Trip } from '@/types'
 
+const trips = ref<Trip[]>([])
 
-const trips = ref([
-  {
-    id: 1,
-    name: 'Berlin Trip',
-    status: 'planned',
-    startDate: '2026-06-01',
-    endDate: '2026-06-05',
-    location: 'Berlin',
-    placesCount: 5
-  }
-])
 onMounted(async () => {
   trips.value = await tripService.getAllTrips()
 })
@@ -24,7 +15,7 @@ onMounted(async () => {
   <div>
     <TripCard
       v-for="trip in trips"
-      :key="trip.id"
+      :key="trip.tripId"
       :trip="trip"
     />
   </div>

@@ -22,7 +22,7 @@ onMounted(async () => {
 async function loadTripData() {
   loading.value = true
   error.value = ''
-  
+
   try {
     trip.value = await tripService.getTripById(tripId.value)
     places.value = await placeService.getPlacesByTrip(tripId.value)
@@ -164,125 +164,35 @@ function goBack() {
 </template>
 
 <style scoped>
-.trip-detail-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.loading,
+.trip-detail-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+.loading, .error-banner { text-align: center; padding: 40px 20px; }
 .error-banner {
-  text-align: center;
-  padding: 40px 20px;
+  background: #ffe8e8; color: #cc0000;
+  border-radius: 12px; padding: 16px 20px;
+  display: flex; justify-content: space-between; align-items: center;
 }
-
-.error-banner {
-  background: #ffe8e8;
-  color: #cc0000;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .error-banner button {
-  padding: 8px 16px;
-  background: #cc0000;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  padding: 8px 16px; background: #cc0000; color: white;
+  border: none; border-radius: 6px; cursor: pointer;
 }
-
-.trip-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.trip-header {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+.trip-content { display: flex; flex-direction: column; gap: 24px; }
+.trip-header { display: flex; flex-direction: column; gap: 12px; }
 .btn-back {
-  align-self: flex-start;
-  padding: 8px 12px;
-  background: none;
-  border: 1px solid #e8e4dd;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
+  align-self: flex-start; padding: 8px 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer; font-size: 13px;
+  color: var(--text); transition: border-color 0.2s;
 }
-
-.trip-title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-}
-
-.trip-destination,
-.trip-dates {
-  margin: 0;
-  color: #555;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-}
-
-.stat-card {
-  background: #f9f7f5;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0066cc;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #999;
-}
-
-.places-section {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e8e4dd;
-}
-
-.places-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  background: #f9f7f5;
-  border-radius: 12px;
-  border: 2px dashed #e8e4dd;
-}
-
-.empty-hint {
-  margin-top: 8px;
-  color: #bbb;
-  font-size: 13px;
-}
+.btn-back:hover { border-color: var(--pink); }
+.trip-title { margin: 0; font-size: 32px; }
+.trip-destination, .trip-dates { margin: 0; color: var(--muted); }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
+.stat-number { font-size: 28px; font-weight: 700; color: var(--text); font-family: var(--font-serif); }
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.places-section { display: flex; flex-direction: column; gap: 24px; }
+.section-title { margin: 0 0 12px; font-size: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.places-list { display: flex; flex-direction: column; gap: 8px; }
+.empty-state { text-align: center; padding: 60px 20px; background: var(--surface); border-radius: 12px; border: 2px dashed var(--border); }
+.empty-hint { margin-top: 8px; color: var(--muted); font-size: 13px; }
 </style>

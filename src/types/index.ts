@@ -20,8 +20,7 @@ export interface Place {
   status: 'visited' | 'planned'
   notes?: string
   rating?: number // 0-5
-  latitude?: number
-  longitude?: number
+  address?:string
   visitDate?: Date | string
   createdAt?: Date
   updatedAt?: Date
