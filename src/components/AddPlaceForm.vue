@@ -19,8 +19,7 @@ const formData = ref<Partial<Place>>({
   status: 'planned',
   notes: '',
   rating: 0,
-  latitude: undefined,
-  longitude: undefined,
+  address: '',
   visitDate: undefined
 })
 
@@ -57,8 +56,7 @@ function resetForm() {
     status: 'planned',
     notes: '',
     rating: 0,
-    latitude: undefined,
-    longitude: undefined,
+    address: '',
     visitDate: undefined
   }
 }
@@ -144,26 +142,9 @@ function toggleForm() {
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Latitude</label>
-            <input
-              v-model.number="formData.latitude"
-              type="number"
-              placeholder="e.g., 48.8584"
-              step="0.0001"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Longitude</label>
-            <input
-              v-model.number="formData.longitude"
-              type="number"
-              placeholder="e.g., 2.2945"
-              step="0.0001"
-            />
-          </div>
+        <div class="field">
+          <label>Address</label>
+          <input v-model="formData.address" type="text" placeholder="e.g. Champ de Mars, 7th arr., Paris" />
         </div>
 
         <div class="form-group">

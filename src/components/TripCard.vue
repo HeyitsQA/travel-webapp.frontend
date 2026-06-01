@@ -24,7 +24,7 @@ const statusClass = computed(() =>
   props.trip.status === 'planned' ? 'accent-blue' : 'accent-green'
 )
 
-function formatDate(date) {
+function formatDate(date: string) {
   if (!date) return ''
   return new Date(date).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' })
 }
