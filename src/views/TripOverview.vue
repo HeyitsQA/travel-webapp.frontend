@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { tripService } from '@/services/apiService'  // ← apiService not tripService
 import TripCard from '../components/TripCard.vue'
+
 
 const trips = ref([
   {
@@ -13,6 +15,9 @@ const trips = ref([
     placesCount: 5
   }
 ])
+onMounted(async () => {
+  trips.value = await tripService.getAllTrips()
+})
 </script>
 
 <template>

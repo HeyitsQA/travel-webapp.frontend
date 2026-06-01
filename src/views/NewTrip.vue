@@ -42,7 +42,7 @@ async function handleSubmit() {
       status: form.status,
       description: form.description
     })
-    
+
     console.log('✅ Trip saved successfully:', newTrip)
     router.push(`/trips/${newTrip.tripId}`)
   } catch (err) {
@@ -71,19 +71,19 @@ function goBack() {
         <div class="row">
           <div class="field">
             <label>Trip Name *</label>
-            <input 
-              v-model="form.name" 
-              type="text" 
-              placeholder="e.g. Tokyo Summer" 
+            <input
+              v-model="form.name"
+              type="text"
+              placeholder="e.g. Tokyo Summer"
               required
             />
           </div>
           <div class="field">
             <label>Destination *</label>
-            <input 
-              v-model="form.destination" 
-              type="text" 
-              placeholder="e.g. Tokyo, Japan" 
+            <input
+              v-model="form.destination"
+              type="text"
+              placeholder="e.g. Tokyo, Japan"
               required
             />
           </div>
@@ -110,15 +110,15 @@ function goBack() {
 
         <div class="field">
           <label>Description</label>
-          <textarea 
-            v-model="form.description" 
-            placeholder="What's this trip about?" 
-            rows="3" 
+          <textarea
+            v-model="form.description"
+            placeholder="What's this trip about?"
+            rows="3"
           />
         </div>
 
-        <button 
-          class="btn-submit" 
+        <button
+          class="btn-submit"
           @click="handleSubmit"
           :disabled="loading"
         >
