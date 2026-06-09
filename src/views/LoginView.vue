@@ -1,13 +1,15 @@
-<script>
+<script setup>
 import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 
+const router = useRouter()
 const email = ref('')
 const password = ref('')
 
-function handleLogIn() {
-  // TODO: connect to backend
+function handleSignIn() {
+  // TODO: connect to backend (echte Authentifizierung)
   console.log('Log in:', email.value)
+  localStorage.setItem('isLoggedIn', 'true')
   router.push('/')
 }
 </script>

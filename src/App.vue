@@ -6,6 +6,7 @@ const authPages = ['/login', '/signup']
 
 function handleLogout() {
   // TODO: clear auth token/session later
+  localStorage.removeItem('isLoggedIn')
   router.push('/login')
 }
 </script>

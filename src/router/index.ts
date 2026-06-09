@@ -12,16 +12,19 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/trips',
       name: 'trips',
       component: TripOverview,
+      meta: { requiresAuth: true },
     },
     {
       path: '/trips/new',
       name: 'new-trip',
       component: NewTrip,
+      meta: { requiresAuth: true },
     },
     {
       path: '/login',
@@ -36,9 +39,24 @@ const router = createRouter({
     {
       path: '/trips/:id',
       name: 'trip-detail',
-      component: () => import('@/views/TripDetailView.vue')
+      component: () => import('@/views/TripDetailView.vue'),
+      meta: { requiresAuth: true },
     }
   ],
+})
+
+// Schützt Routen mit meta.requiresAuth: ohne Login -> weiter zu /login
+router.beforeEach((to) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    return { name: 'login' }
+  }
+
+  // Bereits eingeloggt? Login/Signup-Seiten überspringen
+  if ((to.name === 'login' || to.name === 'signup') && isLoggedIn) {
+    return { name: 'home' }
+  }
 })
 
 export default router
