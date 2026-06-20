@@ -176,8 +176,8 @@ function toggleForm() {
 
 .btn-add-place {
   padding: 12px 20px;
-  background: linear-gradient(135deg, #0066cc, #0052a3);
-  color: white;
+  background: var(--pink);
+  color: var(--text);
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -188,7 +188,7 @@ function toggleForm() {
 }
 
 .btn-add-place:hover {
-  background: linear-gradient(135deg, #0052a3, #003d7a);
+  background: #fc9f9f;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
 }
@@ -281,7 +281,7 @@ form {
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #0066cc;
+  border-color: var(--border);
   box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
 }
 
@@ -340,12 +340,12 @@ form {
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #1a7a2a, #0d5a1a);
-  color: white;
+  background: var(--pink);
+  color: var(--text);
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0d5a1a, #003d0a);
+  background: var(--lavender);
 }
 
 .btn-submit:disabled {

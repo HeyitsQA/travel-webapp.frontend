@@ -14,6 +14,13 @@ const trip = ref<Trip | null>(null)
 const places = ref<Place[]>([])
 const loading = ref(true)
 const error = ref('')
+const searchQuery = ref('')
+const showFilters = ref(false)
+
+const selectedStatus = ref('')
+const selectedCategory = ref('')
+const selectedRating = ref('')
+const sortBy = ref('newest')
 
 onMounted(async () => {
   await loadTripData()
@@ -69,6 +76,95 @@ const averageRating = computed(() => {
   return (rated.reduce((sum, p) => sum + (p.rating || 0), 0) / rated.length).toFixed(1)
 })
 
+const availableCategories = computed(() => {
+  return [...new Set(
+    places.value
+      .map(place => place.category)
+      .filter(Boolean)
+  )].sort()
+})
+
+const filteredPlaces = computed(() => {
+  let result = [...places.value]
+
+  // Search
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+
+    result = result.filter(place =>
+      place.name.toLowerCase().includes(query) ||
+      place.category?.toLowerCase().includes(query) ||
+      place.notes?.toLowerCase().includes(query) ||
+      place.address?.toLowerCase().includes(query)
+    )
+  }
+
+  // Status
+  if (selectedStatus.value) {
+    result = result.filter(
+      place => place.status === selectedStatus.value
+    )
+  }
+
+  // Category
+  if (selectedCategory.value) {
+    result = result.filter(
+      place => place.category === selectedCategory.value
+    )
+  }
+
+  // Rating
+  if (selectedRating.value) {
+    const minimumRating = Number(selectedRating.value)
+
+    result = result.filter(
+      place => (place.rating ?? 0) >= minimumRating
+    )
+  }
+
+  // Sorting
+  switch (sortBy.value) {
+    case 'oldest':
+      result.sort((a, b) =>
+        new Date(a.visitDate ?? 0).getTime() -
+        new Date(b.visitDate ?? 0).getTime()
+      )
+      break
+
+    case 'highest-rating':
+      result.sort(
+        (a, b) => (b.rating ?? 0) - (a.rating ?? 0)
+      )
+      break
+
+    case 'lowest-rating':
+      result.sort(
+        (a, b) => (a.rating ?? 0) - (b.rating ?? 0)
+      )
+      break
+
+    case 'name':
+      result.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      )
+      break
+
+    default:
+      result.sort((a, b) =>
+        new Date(b.visitDate ?? 0).getTime() -
+        new Date(a.visitDate ?? 0).getTime()
+      )
+  }
+
+  return result
+})
+
+const hasActiveFilters = computed(() =>
+  searchQuery.value ||
+  selectedStatus.value ||
+  selectedCategory.value ||
+  selectedRating.value
+)
 function formatDate(date: string | Date | undefined) {
   if (!date) return ''
   return new Date(date).toLocaleDateString('de-DE', {
@@ -126,38 +222,105 @@ function goBack() {
       </div>
 
       <AddPlaceForm :trip-id="tripId" @place-added="handlePlaceAdded" />
-
       <div class="places-section">
-        <div v-if="visitedPlaces.length > 0" class="places-group">
-          <h2 class="section-title">✓ Visited Places ({{ visitedPlaces.length }})</h2>
-          <div class="places-list">
-            <PlaceCard
-              v-for="place in visitedPlaces"
-              :key="place.placeId"
-              :place="place"
-              @update:place="handleUpdatePlace"
-              @delete="handleDeletePlace"
-            />
+
+        <div class="search-filter-bar">
+          <input
+            v-model="searchQuery"
+            class="search-input"
+            type="text"
+            placeholder="🔍 Search places..."
+          />
+
+          <button
+            class="filter-toggle"
+            @click="showFilters = !showFilters"
+          >
+            ⚙️ Filters
+          </button>
+        </div>
+
+        <div
+          v-if="showFilters"
+          class="filters-panel"
+        >
+          <div class="filter-group">
+            <label>Status</label>
+
+            <select v-model="selectedStatus">
+              <option value="">All</option>
+              <option value="planned">Planned</option>
+              <option value="visited">Visited</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Category</label>
+
+            <select v-model="selectedCategory">
+              <option value="">All</option>
+
+              <option
+                v-for="category in availableCategories"
+                :key="category"
+                :value="category"
+              >
+                {{ category }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Rating</label>
+
+            <select v-model="selectedRating">
+              <option value="">All</option>
+              <option value="5">5★</option>
+              <option value="4">4★+</option>
+              <option value="3">3★+</option>
+              <option value="2">2★+</option>
+              <option value="1">1★+</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Sort</label>
+
+            <select v-model="sortBy">
+              <option value="newest">Newest Visit</option>
+              <option value="oldest">Oldest Visit</option>
+              <option value="highest-rating">Highest Rating</option>
+              <option value="lowest-rating">Lowest Rating</option>
+              <option value="name">Name A–Z</option>
+            </select>
           </div>
         </div>
 
-        <div v-if="plannedPlaces.length > 0" class="places-group">
-          <h2 class="section-title">○ Planned Places ({{ plannedPlaces.length }})</h2>
-          <div class="places-list">
-            <PlaceCard
-              v-for="place in plannedPlaces"
-              :key="place.placeId"
-              :place="place"
-              @update:place="handleUpdatePlace"
-              @delete="handleDeletePlace"
-            />
-          </div>
+        <div class="results-info">
+          Showing {{ filteredPlaces.length }}
+          of {{ places.length }} places
         </div>
 
-        <div v-if="places.length === 0" class="empty-state">
-          <p>No places added yet.</p>
-          <p class="empty-hint">Click "Add Place to Trip" above to get started!</p>
+        <div
+          v-if="filteredPlaces.length > 0"
+          class="places-list"
+        >
+          <PlaceCard
+            v-for="place in filteredPlaces"
+            :key="place.placeId"
+            :place="place"
+            @update:place="handleUpdatePlace"
+            @delete="handleDeletePlace"
+          />
         </div>
+
+        <div
+          v-else
+          class="empty-state"
+        >
+          <p>No places match your filters.</p>
+        </div>
+
       </div>
     </div>
   </div>
@@ -195,4 +358,75 @@ function goBack() {
 .places-list { display: flex; flex-direction: column; gap: 8px; }
 .empty-state { text-align: center; padding: 60px 20px; background: var(--surface); border-radius: 12px; border: 2px dashed var(--border); }
 .empty-hint { margin-top: 8px; color: var(--muted); font-size: 13px; }
+.search-filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(247, 182, 200, 0.2);
+}
+
+.filter-toggle {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.filter-toggle:hover {
+  border-color: var(--pink);
+}
+
+.filters-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.filter-group select {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.results-info {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
 </style>

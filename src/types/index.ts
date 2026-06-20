@@ -6,6 +6,7 @@ export interface Trip {
   destination: string
   startDate: Date
   endDate: Date
+  status: 'planned' | 'visited'
   description?: string
   userId?: number
   createdAt?: Date
