@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { tripService } from '@/services/apiService'
 import TripCard from '../components/TripCard.vue'
 import type { Trip } from '@/types'
