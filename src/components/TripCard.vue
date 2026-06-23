@@ -3,6 +3,7 @@
     <div class="card trip-card">
       <div class="header">
         <h2 class="title">{{ trip.name }}</h2>
+        <button class="delete-btn" @click.prevent.stop="handleDelete">🗑️</button>
         <span class="pill" :class="statusClass">{{ trip.status }}</span>
       </div>
       <p class="dates">{{ formatDate(trip.startDate) }} – {{ formatDate(trip.endDate) }}</p>
@@ -19,6 +20,7 @@ import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
 const props = defineProps({ trip: { type: Object, required: true } })
+const emit = defineEmits(['delete'])
 
 const statusClass = computed(() =>
   props.trip.status === 'planned' ? 'accent-blue' : 'accent-green'
@@ -27,6 +29,12 @@ const statusClass = computed(() =>
 function formatDate(date: string) {
   if (!date) return ''
   return new Date(date).toLocaleDateString('de-DE', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function handleDelete() {
+  if (confirm('Do you really want to delete this trip?')) {
+    emit('delete', props.trip.tripId)
+  }
 }
 </script>
 
@@ -58,4 +66,18 @@ function formatDate(date: string) {
 .meta { font-size: 13px; margin: 0; color: var(--muted); }
 .footer { margin-top: 12px; display: flex; justify-content: flex-end; }
 .muted { font-size: 12px; color: var(--muted); }
+.delete-btn {
+  margin-left: auto;
+  margin-right: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
+}
 </style>
