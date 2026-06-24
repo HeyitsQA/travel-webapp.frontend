@@ -16,6 +16,15 @@ onMounted(async () => {
   trips.value = await tripService.getAllTrips()
 })
 
+async function handleDelete(id: number) {
+  try {
+    await tripService.deleteTrip(id)
+    trips.value = trips.value.filter(t => t.tripId !== id)
+  } catch (err) {
+    alert('Failed to delete trip. Please try again.')
+  }
+}
+
 const availableYears = computed(() => {
   return [...new Set(
     trips.value.map(trip =>
@@ -159,6 +168,7 @@ const filteredTrips = computed(() => {
         v-for="trip in filteredTrips"
         :key="trip.tripId"
         :trip="trip"
+        @delete="handleDelete"
       />
     </div>
 

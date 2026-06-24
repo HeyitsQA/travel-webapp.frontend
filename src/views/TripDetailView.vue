@@ -68,6 +68,18 @@ async function handleDeletePlace(placeId: number) {
   }
 }
 
+async function handleDeleteTrip() {
+  if (!confirm('Do you really want to delete this trip?')) return
+
+  try {
+    await tripService.deleteTrip(tripId.value)
+    router.push('/trips')
+  } catch (err) {
+    error.value = 'Failed to delete trip'
+    console.error(err)
+  }
+}
+
 const visitedPlaces = computed(() => places.value.filter(p => p.status === 'visited'))
 const plannedPlaces = computed(() => places.value.filter(p => p.status === 'planned'))
 const averageRating = computed(() => {
@@ -194,7 +206,10 @@ function goBack() {
       <div class="trip-header">
         <button class="btn-back" @click="goBack">← Back to Trips</button>
         <div class="header-content">
-          <h1 class="trip-title">{{ trip.name }}</h1>
+          <div class="title-row">
+            <h1 class="trip-title">{{ trip.name }}</h1>
+            <button class="btn-delete-trip" @click="handleDeleteTrip">🗑️ Delete Trip</button>
+          </div>
           <p class="trip-destination">📍 {{ trip.destination }}</p>
           <p class="trip-dates">
             {{ formatDate(trip.startDate) }} — {{ formatDate(trip.endDate) }}
@@ -348,6 +363,30 @@ function goBack() {
 }
 .btn-back:hover { border-color: var(--pink); }
 .trip-title { margin: 0; font-size: 32px; }
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-delete-trip {
+  padding: 8px 14px;
+  background: #ffe8e8;
+  color: #cc0000;
+  border: 1px solid #ffcccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-delete-trip:hover {
+  background: #cc0000;
+  color: white;
+  border-color: #cc0000;
+}
 .trip-destination, .trip-dates { margin: 0; color: var(--muted); }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
