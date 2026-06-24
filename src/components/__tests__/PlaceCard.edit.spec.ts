@@ -18,9 +18,10 @@ describe('PlaceCard (edit mode)', () => {
     await wrapper.find('.btn-edit').trigger('click')
 
     expect(wrapper.find('.form').exists()).toBe(true)
-    expect(wrapper.find('input[type="text"]').element.value).toBe('Shibuya Crossing')
-  })
 
+    const input = wrapper.find('input[type="text"]')
+    expect((input.element as HTMLInputElement).value).toBe('Shibuya Crossing')
+  })
 
   it('should leave edit mode after saving', async () => {
     const wrapper = mount(PlaceCard, { props: { place } })
@@ -31,16 +32,23 @@ describe('PlaceCard (edit mode)', () => {
     expect(wrapper.find('.form').exists()).toBe(false)
   })
 
-
   it('should update the rating when a star is clicked', async () => {
     const wrapper = mount(PlaceCard, { props: { place } })
 
     await wrapper.find('.btn-edit').trigger('click')
+
     const stars = wrapper.findAll('.star')
-    await stars[2].trigger('click') // 3rd star -> rating of 3
+
+    expect(stars.length).toBeGreaterThan(2)
+
+    await stars[2]!.trigger('click')
     await wrapper.find('.btn-save').trigger('click')
 
     const emitted = wrapper.emitted('update:place')
-    expect(emitted![0][0]).toMatchObject({ rating: 3 })
+
+    expect(emitted).toBeTruthy()
+    expect(emitted?.[0]?.[0]).toMatchObject({
+      rating: 3,
+    })
   })
 })

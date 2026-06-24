@@ -39,21 +39,28 @@ describe('TripOverview (search & filters)', () => {
     vi.mocked(tripService.getAllTrips).mockResolvedValueOnce(trips)
 
     const wrapper = shallowMount(TripOverview)
+
     await flushPromises()
 
     await wrapper.find('.filter-toggle').trigger('click')
-    const statusSelect = wrapper.findAll('select')[0]
-    await statusSelect.setValue('visited')
+
+    const selects = wrapper.findAll('select')
+
+    expect(selects.length).toBeGreaterThan(0)
+
+    await selects[0]!.setValue('visited')
 
     const cards = wrapper.findAllComponents(TripCard)
+
     expect(cards).toHaveLength(1)
-    expect(cards[0].props('trip').status).toBe('visited')
+    expect(cards[0]!.props('trip').status).toBe('visited')
   })
 
   it('should show no results message when the search matches nothing', async () => {
     vi.mocked(tripService.getAllTrips).mockResolvedValueOnce(trips)
 
     const wrapper = shallowMount(TripOverview)
+
     await flushPromises()
 
     await wrapper.find('.search-input').setValue('nonexistent destination')
