@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { tripService } from '@/services/apiService'
 
 const router = useRouter()
+const { user } = useAuth0()
 const loading = ref(false)
 const error = ref('')
 
@@ -20,7 +22,7 @@ async function handleSubmit() {
   loading.value = true
   error.value = ''
   try {
-    const newTrip = await tripService.createTrip({ ...form })
+    const newTrip = await tripService.createTrip({ ...form, userId: user.value?.sub })
     router.push(`/trips/${newTrip.tripId}`)
   } catch (err) {
     error.value = 'Failed to create trip. Please try again.'

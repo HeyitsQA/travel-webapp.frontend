@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { tripService } from '@/services/apiService'
 import TripCard from '../components/TripCard.vue'
 import type { Trip } from '@/types'
 
+const { user } = useAuth0()
 const trips = ref<Trip[]>([])
 const searchQuery = ref('')
 const showFilters = ref(false)
@@ -13,7 +15,9 @@ const selectedYear = ref('')
 const sortBy = ref('newest')
 
 onMounted(async () => {
-  trips.value = await tripService.getAllTrips()
+  if (user.value?.sub) {
+    trips.value = await tripService.getAllTrips(user.value.sub)
+  }
 })
 
 async function handleDelete(id: number) {

@@ -1,10 +1,10 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api'
 
 // Trip API calls
 export const tripService = {
-  async getAllTrips() {
-    const response = await fetch(`${API_BASE_URL}/trips`)
+  async getAllTrips(userId: string) {
+    const response = await fetch(`${API_BASE_URL}/trips?userId=${encodeURIComponent(userId)}`)
     if (!response.ok) throw new Error('Failed to fetch trips')
     return response.json()
   },
