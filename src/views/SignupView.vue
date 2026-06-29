@@ -1,51 +1,17 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 
-const router = useRouter()
-const name = ref('')
-const email = ref('')
-const password = ref('')
+const { loginWithRedirect } = useAuth0()
 
-function handleSignUp() {
-  // TODO: connect to backend (echte Registrierung)
-  console.log('Sign up:', name.value, email.value)
-  localStorage.setItem('isLoggedIn', 'true')
-  router.push('/')
-}
+loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })
 </script>
 
 <template>
   <div class="page">
     <div class="card">
       <img src="@/assets/logo.png" alt="Travel Journal Logo" class="logo" />
-
       <h1 class="title">Create Account</h1>
-      <p class="subtitle">Start logging your adventures</p>
-
-      <div class="form">
-        <div class="field">
-          <label>Name</label>
-          <input v-model="name" type="text" placeholder="Your name" />
-        </div>
-
-        <div class="field">
-          <label>Email</label>
-          <input v-model="email" type="email" placeholder="you@example.com" />
-        </div>
-
-        <div class="field">
-          <label>Password</label>
-          <input v-model="password" type="password" placeholder="••••••••" />
-        </div>
-
-        <button class="btn-primary" @click="handleSignUp">Sign Up</button>
-
-        <p class="switch">
-          Already have an account?
-          <RouterLink to="/login">Sign in</RouterLink>
-        </p>
-      </div>
+      <p class="subtitle">Redirecting to sign up…</p>
     </div>
   </div>
 </template>

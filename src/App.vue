@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { RouterLink, RouterView, useRouter, useRoute } from 'vue-router'
-const router = useRouter()
+import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
+
 const route = useRoute()
 const authPages = ['/login', '/signup']
+const { isAuthenticated, logout } = useAuth0()
 
-function handleLogout() {
-  // TODO: clear auth token/session later
-  localStorage.removeItem('isLoggedIn')
-  router.push('/login')
-}
 </script>
 
 <template>
   <header class="nav"  v-if="!authPages.includes(route.path)">
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/about">About</RouterLink>
-    <button class="logout-button" @click="handleLogout">Log Out</button>
+    <button class="logout-button" @click="logout">Log Out</button>
   </header>
 
   <RouterView />

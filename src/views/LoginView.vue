@@ -1,45 +1,17 @@
 <script setup>
-import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 
-const router = useRouter()
-const email = ref('')
-const password = ref('')
+const { loginWithRedirect } = useAuth0()
 
-function handleSignIn() {
-  // TODO: connect to backend (echte Authentifizierung)
-  console.log('Log in:', email.value)
-  localStorage.setItem('isLoggedIn', 'true')
-  router.push('/')
-}
+loginWithRedirect()
 </script>
 
 <template>
   <div class="container">
     <div class="card">
       <img src="@/assets/logo.png" alt="Travel Journal Logo" class="logo" />
-
       <h1 class="title">Welcome Back</h1>
-      <p class="subtitle">Sign in to your travel journal</p>
-
-      <div class="form">
-        <div class="field">
-          <label>Email</label>
-          <input v-model="email" type="email" placeholder="you@example.com" />
-        </div>
-
-        <div class="field">
-          <label>Password</label>
-          <input v-model="password" type="password" placeholder="••••••••" />
-        </div>
-
-        <button class="btn-primary" @click="handleSignIn">Sign In</button>
-
-        <p class="switch">
-          Don't have an account?
-          <RouterLink to="/signup">Sign up</RouterLink>
-        </p>
-      </div>
+      <p class="subtitle">Redirecting to sign in…</p>
     </div>
   </div>
 </template>

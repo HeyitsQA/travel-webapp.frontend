@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { authGuard } from '@auth0/auth0-vue'
 import HomeView from '../views/HomeView.vue'
 import TripOverview from '../views/TripOverview.vue'
 import NewTrip from '@/views/NewTrip.vue'
@@ -12,19 +13,19 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true },
+      beforeEnter: authGuard,
     },
     {
       path: '/trips',
       name: 'trips',
       component: TripOverview,
-      meta: { requiresAuth: true },
+      beforeEnter: authGuard,
     },
     {
       path: '/trips/new',
       name: 'new-trip',
       component: NewTrip,
-      meta: { requiresAuth: true },
+      beforeEnter: authGuard,
     },
     {
       path: '/login',
@@ -40,23 +41,9 @@ const router = createRouter({
       path: '/trips/:id',
       name: 'trip-detail',
       component: () => import('@/views/TripDetailView.vue'),
-      meta: { requiresAuth: true },
+      beforeEnter: authGuard,
     }
   ],
-})
-
-// Schützt Routen mit meta.requiresAuth: ohne Login -> weiter zu /login
-router.beforeEach((to) => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
-
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    return { name: 'login' }
-  }
-
-  // Bereits eingeloggt? Login/Signup-Seiten überspringen
-  if ((to.name === 'login' || to.name === 'signup') && isLoggedIn) {
-    return { name: 'home' }
-  }
 })
 
 export default router
