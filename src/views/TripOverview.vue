@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { tripService } from '@/services/apiService'
+import { tripService, placeService } from '@/services/apiService'
 import TripCard from '../components/TripCard.vue'
 import type { Trip } from '@/types'
 
@@ -17,6 +17,10 @@ const sortBy = ref('newest')
 onMounted(async () => {
   if (user.value?.sub) {
     trips.value = await tripService.getAllTrips(user.value.sub)
+    for (const trip of trips.value) {
+      const places = await placeService.getPlacesByTrip(trip.tripId)
+      trip.placesCount = places.length
+    }
   }
 })
 
