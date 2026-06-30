@@ -9,6 +9,13 @@ vi.mock('@/services/apiService', () => ({
   tripService: {
     getAllTrips: vi.fn(),
   },
+  placeService: {
+    getPlacesByTrip: vi.fn().mockResolvedValue([]),
+  },
+}))
+
+vi.mock('@auth0/auth0-vue', () => ({
+  useAuth0: () => ({ user: { value: { sub: 'test-user-id' } } }),
 }))
 
 describe('TripOverview (search & filters)', () => {

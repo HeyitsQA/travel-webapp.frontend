@@ -15,6 +15,10 @@ vi.mock('@/services/apiService', () => ({
   },
 }))
 
+vi.mock('@auth0/auth0-vue', () => ({
+  useAuth0: () => ({ user: { value: { sub: 'test-user-id' } } }),
+}))
+
 describe('NewTrip (validation)', () => {
   beforeEach(() => {
     pushMock.mockReset()
