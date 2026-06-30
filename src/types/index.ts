@@ -8,9 +8,11 @@ export interface Trip {
   endDate: Date
   status: 'planned' | 'visited'
   description?: string
-  userId?: number
+  userId?: string
   createdAt?: Date
   updatedAt?: Date
+  placesCount?: number
+
 }
 
 export interface Place {
@@ -28,7 +30,7 @@ export interface Place {
 }
 
 export interface User {
-  userId: number
+  userId: string
   username: string
   email: string
   createdAt: Date
