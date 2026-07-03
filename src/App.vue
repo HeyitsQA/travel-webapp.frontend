@@ -12,7 +12,10 @@ const { isAuthenticated, logout } = useAuth0()
   <header class="nav"  v-if="!publicPages.includes(route.path)">
     <RouterLink to="/home">Home</RouterLink>
     <RouterLink to="/about">About</RouterLink>
-    <button class="logout-button" @click="() => logout()">Log Out</button>
+    <button
+      class="logout-button"
+      @click="() => logout({ logoutParams: { returnTo: window.location.origin } })"
+    >Log Out</button>
   </header>
 
   <RouterView />
