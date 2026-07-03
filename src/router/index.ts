@@ -42,6 +42,12 @@ const router = createRouter({
       name: 'trip-detail',
       component: () => import('@/views/TripDetailView.vue'),
       beforeEnter: authGuard,
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/AboutPageView.vue'),
+      beforeEnter: authGuard,
     }
   ],
 })
