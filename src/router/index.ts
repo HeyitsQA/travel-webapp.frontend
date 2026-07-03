@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard } from '@auth0/auth0-vue'
 import HomeView from '../views/HomeView.vue'
+import LandingView from '@/views/LandingView.vue'
 import TripOverview from '../views/TripOverview.vue'
 import NewTrip from '@/views/NewTrip.vue'
 import LoginView from '@/views/LoginView.vue'
@@ -11,6 +12,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'landing',
+      component: LandingView,
+    },
+    {
+      path: '/home',
       name: 'home',
       component: HomeView,
       beforeEnter: authGuard,
