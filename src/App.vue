@@ -6,16 +6,16 @@ const route = useRoute()
 const publicPages = ['/', '/login', '/signup']
 const { isAuthenticated, logout } = useAuth0()
 
+function handleLogout() {
+  logout({ logoutParams: { returnTo: window.location.origin } })
+}
 </script>
 
 <template>
   <header class="nav"  v-if="!publicPages.includes(route.path)">
     <RouterLink to="/home">Home</RouterLink>
     <RouterLink to="/about">About</RouterLink>
-    <button
-      class="logout-button"
-      @click="() => logout({ logoutParams: { returnTo: window.location.origin } })"
-    >Log Out</button>
+    <button class="logout-button" @click="handleLogout">Log Out</button>
   </header>
 
   <RouterView />
