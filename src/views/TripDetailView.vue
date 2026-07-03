@@ -5,10 +5,17 @@ import { tripService, placeService } from '@/services/apiService'
 import PlaceCard from '@/components/PlaceCard.vue'
 import AddPlaceForm from '@/components/AddPlaceForm.vue'
 import type { Trip, Place } from '@/types'
+import {
+  cloneExampleTrip,
+  cloneExamplePlaces,
+  isExampleTripId,
+} from '@/mocks/exampleTrip'
 
 const route = useRoute()
 const router = useRouter()
 const tripId = computed(() => Number(route.params.id))
+const isExample = computed(() => isExampleTripId(tripId.value))
+let nextExamplePlaceId = -200
 
 const trip = ref<Trip | null>(null)
 const places = ref<Place[]>([])
@@ -16,6 +23,10 @@ const loading = ref(true)
 const error = ref('')
 const searchQuery = ref('')
 const showFilters = ref(false)
+
+const isEditingDescription = ref(false)
+const editedDescription = ref('')
+const savingDescription = ref(false)
 
 const selectedStatus = ref('')
 const selectedCategory = ref('')
@@ -30,6 +41,13 @@ async function loadTripData() {
   loading.value = true
   error.value = ''
 
+  if (isExample.value) {
+    trip.value = cloneExampleTrip()
+    places.value = cloneExamplePlaces()
+    loading.value = false
+    return
+  }
+
   try {
     trip.value = await tripService.getTripById(tripId.value)
     places.value = await placeService.getPlacesByTrip(tripId.value)
@@ -42,10 +60,18 @@ async function loadTripData() {
 }
 
 async function handlePlaceAdded(newPlace: Place) {
+  if (isExample.value && newPlace.placeId == null) {
+    newPlace.placeId = nextExamplePlaceId--
+  }
   places.value.push(newPlace)
 }
 
 async function handleUpdatePlace(updatedPlace: Place) {
+  if (isExample.value) {
+    const index = places.value.findIndex(p => p.placeId === updatedPlace.placeId)
+    if (index !== -1) places.value[index] = { ...updatedPlace }
+    return
+  }
   try {
     const saved = await placeService.updatePlace(updatedPlace.placeId!, updatedPlace)
     const index = places.value.findIndex(p => p.placeId === updatedPlace.placeId)
@@ -59,6 +85,10 @@ async function handleUpdatePlace(updatedPlace: Place) {
 }
 
 async function handleDeletePlace(placeId: number) {
+  if (isExample.value) {
+    places.value = places.value.filter(p => p.placeId !== placeId)
+    return
+  }
   try {
     await placeService.deletePlace(placeId)
     places.value = places.value.filter(p => p.placeId !== placeId)
@@ -68,8 +98,51 @@ async function handleDeletePlace(placeId: number) {
   }
 }
 
+function startEditDescription() {
+  if (!trip.value) return
+  editedDescription.value = trip.value.description ?? ''
+  isEditingDescription.value = true
+}
+
+function cancelEditDescription() {
+  isEditingDescription.value = false
+  editedDescription.value = ''
+}
+
+async function saveDescription() {
+  if (!trip.value) return
+  savingDescription.value = true
+  error.value = ''
+
+  if (isExample.value) {
+    trip.value = { ...trip.value, description: editedDescription.value }
+    isEditingDescription.value = false
+    savingDescription.value = false
+    return
+  }
+
+  try {
+    const updated = await tripService.updateTrip(trip.value.tripId, {
+      ...trip.value,
+      description: editedDescription.value
+    })
+    trip.value = updated
+    isEditingDescription.value = false
+  } catch (err) {
+    error.value = 'Failed to update description'
+    console.error(err)
+  } finally {
+    savingDescription.value = false
+  }
+}
+
 async function handleDeleteTrip() {
   if (!confirm('Do you really want to delete this trip?')) return
+
+  if (isExample.value) {
+    router.push('/trips')
+    return
+  }
 
   try {
     await tripService.deleteTrip(tripId.value)
@@ -208,12 +281,48 @@ function goBack() {
         <div class="header-content">
           <div class="title-row">
             <h1 class="trip-title">{{ trip.name }}</h1>
+            <span v-if="isExample" class="example-badge">Preview — not saved</span>
             <button class="btn-delete-trip" @click="handleDeleteTrip">🗑️ Delete Trip</button>
           </div>
           <p class="trip-destination">📍 {{ trip.destination }}</p>
           <p class="trip-dates">
             {{ formatDate(trip.startDate) }} — {{ formatDate(trip.endDate) }}
           </p>
+
+          <div class="description-block">
+            <div v-if="!isEditingDescription" class="description-view">
+              <p v-if="trip.description" class="trip-description">{{ trip.description }}</p>
+              <p v-else class="trip-description-empty">No description yet.</p>
+              <button class="btn-edit-description" @click="startEditDescription">
+                {{ trip.description ? 'Edit description' : 'Add description' }}
+              </button>
+            </div>
+
+            <div v-else class="description-edit">
+              <textarea
+                v-model="editedDescription"
+                class="description-textarea"
+                rows="3"
+                placeholder="What's this trip about?"
+              />
+              <div class="description-actions">
+                <button
+                  class="btn-save-description"
+                  :disabled="savingDescription"
+                  @click="saveDescription"
+                >
+                  {{ savingDescription ? 'Saving...' : 'Save' }}
+                </button>
+                <button
+                  class="btn-cancel-description"
+                  :disabled="savingDescription"
+                  @click="cancelEditDescription"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -370,6 +479,16 @@ function goBack() {
   flex-wrap: wrap;
 }
 
+.example-badge {
+  padding: 4px 10px;
+  background: var(--lavender, #e6e0ff);
+  color: var(--text);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .btn-delete-trip {
   padding: 8px 14px;
   background: #ffe8e8;
@@ -388,6 +507,36 @@ function goBack() {
   border-color: #cc0000;
 }
 .trip-destination, .trip-dates { margin: 0; color: var(--muted); }
+.trip-description { margin: 0; color: var(--text); line-height: 1.5; white-space: pre-wrap; }
+.description-block { margin-top: 8px; }
+.description-view { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.trip-description-empty { margin: 0; color: var(--muted); font-style: italic; font-size: 13px; }
+.btn-edit-description {
+  padding: 4px 10px; background: transparent; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  font-size: 12px; transition: border-color 0.2s, color 0.2s;
+}
+.btn-edit-description:hover { border-color: var(--pink); color: var(--text); }
+.description-edit { display: flex; flex-direction: column; gap: 8px; }
+.description-textarea {
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+  font-family: var(--font-sans); font-size: 14px; resize: vertical;
+}
+.description-textarea:focus {
+  outline: none; border-color: var(--pink); box-shadow: 0 0 0 3px rgba(247, 182, 200, 0.2);
+}
+.description-actions { display: flex; gap: 8px; }
+.btn-save-description {
+  padding: 6px 14px; background: var(--pink); color: var(--text);
+  border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-save-description:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-cancel-description {
+  padding: 6px 14px; background: var(--surface); color: var(--muted);
+  border: 1px solid var(--border); border-radius: 6px; font-size: 13px; cursor: pointer;
+}
+.btn-cancel-description:hover:not(:disabled) { border-color: var(--pink); }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 12px; text-align: center; }
 .stat-number { font-size: 28px; font-weight: 700; color: var(--text); font-family: var(--font-serif); }

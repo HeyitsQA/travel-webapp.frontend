@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { tripService, placeService } from '@/services/apiService'
 import TripCard from '../components/TripCard.vue'
 import type { Trip } from '@/types'
+import { cloneExampleTrip, EXAMPLE_TRIP_ID } from '@/mocks/exampleTrip'
 
 const { user } = useAuth0()
 const trips = ref<Trip[]>([])
@@ -15,16 +16,26 @@ const selectedYear = ref('')
 const sortBy = ref('newest')
 
 onMounted(async () => {
+  trips.value = [cloneExampleTrip()]
   if (user.value?.sub) {
-    trips.value = await tripService.getAllTrips(user.value.sub)
-    for (const trip of trips.value) {
-      const places = await placeService.getPlacesByTrip(trip.tripId)
-      trip.placesCount = places.length
+    try {
+      const remote = await tripService.getAllTrips(user.value.sub)
+      for (const trip of remote) {
+        const places = await placeService.getPlacesByTrip(trip.tripId)
+        trip.placesCount = places.length
+      }
+      trips.value = remote.length > 0 ? remote : [cloneExampleTrip()]
+    } catch (err) {
+      console.warn('Backend unavailable, showing example trip only.', err)
     }
   }
 })
 
 async function handleDelete(id: number) {
+  if (id === EXAMPLE_TRIP_ID) {
+    trips.value = trips.value.filter(t => t.tripId !== id)
+    return
+  }
   try {
     await tripService.deleteTrip(id)
     trips.value = trips.value.filter(t => t.tripId !== id)
