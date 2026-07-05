@@ -4,8 +4,6 @@ import HomeView from '../views/HomeView.vue'
 import LandingView from '@/views/LandingView.vue'
 import TripOverview from '../views/TripOverview.vue'
 import NewTrip from '@/views/NewTrip.vue'
-import LoginView from '@/views/LoginView.vue'
-import SignupView from '@/views/SignupView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,16 +30,6 @@ const router = createRouter({
       name: 'new-trip',
       component: NewTrip,
       beforeEnter: authGuard,
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
-    },
-    {
-      path: '/signup',
-      name: 'signup',
-      component: SignupView,
     },
     {
       path: '/trips/:id',
